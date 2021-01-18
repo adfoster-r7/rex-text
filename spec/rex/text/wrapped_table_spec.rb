@@ -112,6 +112,44 @@ describe Rex::Text::Table do
   end
 
   describe "#to_s" do
+
+    describe 'width calculation' do
+      let(:default_options) do
+        {
+          'Header' => 'Header',
+          'Columns' => [
+            'Column 1',
+            'Column 2',
+            'Column 3'
+          ]
+        }
+      end
+      let(:table) { Rex::Text::Table.new(options) }
+      let(:rows) { 120 }
+      let(:columns) { 80 }
+      let(:io_console) { double(:console, winsize: [rows, columns]) }
+
+      before(:each) do
+        allow(::IO).to receive(:console).and_return(io_console)
+      end
+
+      context "when a width is specified" do
+        let(:options) { default_options.merge({ 'Width' =>  100 }) }
+        it { expect(table.width).to eql 100 }
+      end
+
+      context "when a width is not specified" do
+        let(:options) { default_options }
+        it { expect(table.width).to eql 80 }
+      end
+
+      context 'when the IO.console API is not available' do
+        let(:options) { default_options }
+        let(:io_console) { nil }
+        it { expect(table.width).to eql BigDecimal::INFINITY }
+      end
+    end
+
     it 'should space columns correctly' do
       col_1_field = "A" * 5
       col_2_field = "B" * 50
@@ -618,25 +656,25 @@ describe Rex::Text::Table do
         #
         # For simplicity the first option is chosen, as in either scenario the user will have to resize their terminal.
         expect(tbl).to match_table <<~TABLE
-         Header
-         ======
+          Header
+          ======
 
-           N  V  R  D
-           a  a  e  e
-           m  l  q  s
-           e  u  u  c
-              e  i  r
-                 r  i
-                 e  p
-                 d  t
-                    i
-                    o
-                    n
-           -  -  -  -
-           A  A  Y  A
-           B  B  e  B
-           C  C  s  C
-           D  D     D
+            N  V  R  D
+            a  a  e  e
+            m  l  q  s
+            e  u  u  c
+               e  i  r
+                  r  i
+                  e  p
+                  d  t
+                     i
+                     o
+                     n
+            -  -  -  -
+            A  A  Y  A
+            B  B  e  B
+            C  C  s  C
+            D  D     D
         TABLE
       end
     end
