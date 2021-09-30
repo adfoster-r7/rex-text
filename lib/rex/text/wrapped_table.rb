@@ -184,7 +184,7 @@ class WrappedTable
     end
     formatted_fields = fields.map.with_index { |field, idx|
       # Remove whitespace and ensure String format
-      field = format_table_field(field.to_s.strip, idx)
+      field = format_table_field(field.to_s.strip, idx, fields)
 
       if (colprops[idx]['MaxWidth'] < display_width(field.to_s))
         old = colprops[idx]['MaxWidth']
@@ -510,22 +510,22 @@ protected
     optimal_widths.map { |width| [1, width].max }
   end
 
-  def format_table_field(str, idx)
+  def format_table_field(str, idx, row)
     str_cp = str.dup
 
     colprops[idx]['Formatters'].each do |f|
-      str_cp = f.format(str_cp)
+      str_cp = f.format(str_cp, idx, row)
     end
 
     str_cp.dup.force_encoding('UTF-8')
   end
 
-  def style_table_field(str, _idx)
+  def style_table_field(str, _idx, _row)
     str_cp = str.dup
 
     # Not invoking as color currently conflicts with the wrapping of tables
     # colprops[idx]['Stylers'].each do |s|
-    #   str_cp = s.style(str_cp)
+    #   str_cp = s.style(str_cp, idx,row)
     # end
 
     str_cp

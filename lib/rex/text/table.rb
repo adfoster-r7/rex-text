@@ -219,7 +219,7 @@ class Table
     end
     formatted_fields = fields.map.with_index { |field, idx|
       # Remove whitespace and ensure String format
-      field = format_table_field(field.to_s.strip, idx)
+      field = format_table_field(field.to_s.strip, idx, fields)
 
       if (colprops[idx]['MaxWidth'] < field.to_s.length)
         old = colprops[idx]['MaxWidth']
@@ -437,9 +437,9 @@ protected
       # Limit wide cells
       if colprops[idx]['MaxChar']
         last_cell = cell.to_s[0..colprops[idx]['MaxChar'].to_i]
-        line << style_table_field(last_cell, idx)
+        line << style_table_field(last_cell, idx, row)
       else
-        line << style_table_field(cell.to_s, idx)
+        line << style_table_field(cell.to_s, idx, row)
         last_cell = cell
       end
       last_idx = idx
@@ -478,21 +478,21 @@ protected
     return val
   end
 
-  def format_table_field(str, idx)
+  def format_table_field(str, idx, row)
     str_cp = str.clone
 
-    colprops[idx]['Formatters'].each do |f|
-      str_cp = f.format(str_cp)
+    colprops[idx]['Formatters'].each do |formatter|
+      str_cp = formatter.format(str_cp, idx, row)
     end
 
     str_cp
   end
 
-  def style_table_field(str, idx)
+  def style_table_field(str, idx, row)
     str_cp = str.clone
 
-    colprops[idx]['Stylers'].each do |s|
-      str_cp = s.style(str_cp)
+    colprops[idx]['Stylers'].each do |styler|
+      str_cp = styler.style(str_cp, idx, row)
     end
 
     str_cp

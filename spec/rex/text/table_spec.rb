@@ -4,7 +4,7 @@ require 'spec_helper'
 describe Rex::Text::Table do
   let(:formatter) do
     Formatter = Class.new do
-      def format(str)
+      def format(str, _idx, _row)
         "IHAVEBEENFORMATTED#{str}"
       end
     end
@@ -14,7 +14,7 @@ describe Rex::Text::Table do
 
   let(:styler) do
     Styler = Class.new do
-      def style(str)
+      def style(str, _idx, _row)
         "IHAVEBEENSTYLED#{str}"
       end
     end
