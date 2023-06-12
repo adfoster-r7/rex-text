@@ -43,6 +43,10 @@ RSpec.describe Rex::Text do
       "buf = \n\"\\x41\\x41\\x41\\x41\\x41\\x41\" +\n\"\\x41\\x41\\x41\\x41\"\n"
     end
 
+    let(:expected_masm) do
+      "buf DB 41h,42h,43h,44h,45h,46h,47h,48h,49h,4ah\n    DB 4bh,4ch,4dh,4eh,4fh,50h,51h,52h,53h,54h\n    DB 55h,56h,57h,58h,59h,5ah\n"
+    end
+
     it "bash is as expected" do
       output = described_class.to_bash('A' * 10, 30)
       expect(output).to eq(expected_bash)
@@ -66,6 +70,11 @@ RSpec.describe Rex::Text do
     it "nim is as expected" do
       output = described_class.to_nim('A' * 10, 30)
       expect(output).to eq(expected_nim)
+    end
+
+    it "masm is as expected" do
+      output = described_class.to_masm(('A'..'Z').to_a.join, 50)
+      expect(output).to eq(expected_masm)
     end
 
     it "rust is as expected" do
